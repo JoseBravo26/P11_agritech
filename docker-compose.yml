@@ -1,0 +1,23 @@
+# Lance l'API (étape 3) et l'interface Streamlit (étape 4) ensemble.
+#   docker compose up --build
+# Interface : http://localhost:8501   API : http://localhost:8000/docs
+# Si le port 8000 est déjà pris sur la machine : API_PORT=8002 docker compose up --build
+name: agritech
+
+services:
+  api:
+    build: .
+    image: agritech-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+
+  front:
+    build: ./frontend
+    image: agritech-front
+    environment:
+      API_URL: http://api:8000   # nom du service sur le réseau interne de Docker
+    ports:
+      - "${FRONT_PORT:-8501}:8501"
+    depends_on:
+      api:
+        condition: service_healthy   # attend que le modèle soit chargé

@@ -1,0 +1,413 @@
+GLOSSAIRE — notebooks/01_exploration_fusion.ipynb
+Étape 1 : exploration, fusion et préparation des données (Projet 11, Agritech Answers)
+=====================================================================================
+
+Ce glossaire suit l'ordre de lecture du notebook. Les numéros entre crochets
+renvoient aux sections du notebook (§2, §3...). Les termes de code sont écrits
+tels qu'ils apparaissent dans les cellules.
+
+
+-------------------------------------------------------------------------------
+A. LES DONNÉES ET LEURS SOURCES
+-------------------------------------------------------------------------------
+
+DS1 (Agriculture Crop Yield)
+    Fichier « Agriculture Crop Yield/crop_yield.csv ». 1 million de parcelles
+    décrites par la région, le sol, la culture, la pluie, la température,
+    l'engrais, l'irrigation, la météo et la durée de culture. Pas de pays ni
+    d'année. Jeu SYNTHÉTIQUE (généré par une formule + du bruit).
+
+DS2 (Crop Yield Prediction Dataset, FAO)
+    Fichier « Crop Yield Prediction Dataset/yield_df.csv ». Données RÉELLES :
+    rendement par pays, culture et année (1990-2013), avec pluie, température
+    et pesticides. C'est une jointure déjà faite de 4 fichiers bruts :
+    yield.csv, pesticides.csv, rainfall.csv, temp.csv.
+
+FAO
+    Food and Agriculture Organization (ONU). Source des rendements et des
+    pesticides de DS2. La pluie vient de la Banque mondiale.
+
+ds1_raw / ds2_raw
+    Les deux jeux tels que chargés, sans aucun nettoyage.
+
+ds1 / ds2
+    Les deux jeux après nettoyage (clean_ds1 / clean_ds2), §5.3.
+
+fao
+    Version intermédiaire de DS2 construite à la main en §3.2 pour l'explorer :
+    une ligne par (pays, culture, année), rendement en t/ha. Toutes les
+    cultures y sont encore présentes.
+
+common_fao
+    fao restreint aux 4 cultures communes (Maize, Rice, Soybean, Wheat).
+
+dataset
+    Le dataset consolidé final (résultat de prep.fuse). Exporté dans
+    data/processed/dataset_consolide.csv : 666 494 lignes x 11 colonnes.
+
+audit
+    Tableau de contrôle renvoyé par prep.fuse : pour chaque parcelle, le
+    donneur FAO choisi (donor_area, donor_year, donor_temp...) et la distance
+    climatique (donor_distance).
+
+Données synthétiques
+    Données fabriquées par un programme, pas mesurées. Indices dans DS1 :
+    lois uniformes parfaites, modalités toutes de même effectif, rendement
+    expliqué à 91 % par une formule linéaire.
+
+
+-------------------------------------------------------------------------------
+B. VARIABLES MÉTIER ET UNITÉS
+-------------------------------------------------------------------------------
+
+Rendement (Yield)
+    Quantité récoltée par unité de surface. C'est la variable CIBLE du projet.
+
+TARGET = "Yield_tons_per_hectare"
+    Nom de la colonne cible (rendement en tonnes par hectare).
+
+t/ha
+    Tonnes par hectare. Unité retenue pour le rendement.
+
+hg/ha
+    Hectogrammes par hectare (unité FAO). 1 t/ha = 10 000 hg/ha
+    (constante HG_PER_TONNE).
+
+Rainfall_mm / rainfall_mm / average_rain_fall_mm_per_year
+    Pluie en millimètres. Dans DS1 : pluie sur la parcelle pendant la saison
+    (100-1000 mm). Dans DS2 : cumul annuel moyen du pays.
+
+Temperature_Celsius / avg_temp
+    Température en °C. DS1 : température de la parcelle (15-40 °C). DS2 :
+    moyenne annuelle d'une station météo du pays.
+
+Pesticides_tonnes / pesticides_tonnes
+    Tonnes de pesticides (matière active) utilisées par TOUT le pays dans
+    l'année. Ce n'est pas une dose par hectare.
+
+Fertilizer_Used / Irrigation_Used
+    Engrais utilisé / irrigation utilisée (oui/non), convertis en 0/1.
+
+Weather_Condition
+    Météo dominante de la parcelle : Sunny, Rainy, Cloudy.
+
+Days_to_Harvest
+    Durée de la culture en jours (60-149).
+
+Region / Soil_Type
+    Région cardinale (North, South, East, West) et type de sol (6 modalités).
+
+Crop / Item
+    Culture. « Crop » dans DS1, « Item » dans DS2 (noms FAO).
+
+Area / Year
+    Pays et année (DS2 uniquement).
+
+Pratiques culturales (conduite)
+    Ce que fait l'agriculteur : engrais, irrigation.
+
+Agriculture intensive / intensification
+    Agriculture qui utilise beaucoup d'intrants (engrais, pesticides) pour
+    augmenter le rendement.
+
+Rendement potentiel
+    Rendement qu'une culture peut atteindre sous un climat donné, avant
+    l'effet des pratiques.
+
+
+-------------------------------------------------------------------------------
+C. EXPLORATION ET STATISTIQUES (§2 et §3)
+-------------------------------------------------------------------------------
+
+overview(df)
+    Petite fonction du notebook : type, nombre et % de manquants, nombre de
+    valeurs uniques et un exemple, pour chaque colonne.
+
+Valeur manquante (NaN)
+    Case vide. isna() les repère.
+
+Doublon exact
+    Ligne strictement identique à une autre. duplicated() les compte,
+    drop_duplicates() les supprime.
+
+describe()
+    Résumé statistique : moyenne (mean), écart-type (std), min, quartiles
+    (25 %, 50 %, 75 %), max.
+
+Variable numérique / catégorielle / binaire (booléenne)
+    Nombre continu / étiquette parmi une liste / oui-non (0/1).
+
+Modalité
+    Une valeur possible d'une variable catégorielle (ex. « Sunny »).
+
+Équirépartie
+    Toutes les modalités ont à peu près le même effectif.
+
+Distribution
+    Façon dont les valeurs se répartissent.
+    - Uniforme : toutes les valeurs également probables (histogramme plat).
+    - Gaussienne (normale) : en cloche, centrée sur la moyenne.
+    - Asymétrique : étirée d'un côté (typique des données réelles).
+
+Moyenne / médiane
+    Médiane = valeur du milieu (50 % au-dessus, 50 % au-dessous). Moins
+    sensible aux valeurs extrêmes que la moyenne.
+
+Écart-type
+    Mesure de la dispersion autour de la moyenne.
+
+Percentile / quantile
+    Le 99e percentile (P99) est la valeur sous laquelle se trouvent 99 % des
+    observations. Un quantile est la même notion exprimée entre 0 et 1
+    (0,99 = P99).
+
+Ordre de grandeur
+    Facteur 10. « 7 ordres de grandeur » = de 1 à 10 millions.
+
+Transformation logarithmique (log10, log)
+    Remplacer x par log(x) pour ramener des valeurs très étalées sur une
+    échelle lisible et rendre les relations plus linéaires.
+
+Échelle log (sur un graphique)
+    Axe où chaque graduation multiplie par 10 au lieu d'ajouter.
+
+Corrélation (r)
+    Mesure entre -1 et +1 de la relation linéaire entre deux variables.
+    +1 : montent ensemble ; -1 : l'une monte, l'autre descend ; 0 : pas de
+    lien linéaire.
+
+Matrice de corrélation
+    Tableau des corrélations de toutes les paires de variables, affiché en
+    carte de chaleur.
+
+Régression linéaire (LinearRegression)
+    Modèle qui prédit la cible comme une somme pondérée des variables.
+
+Coefficient (de régression)
+    Poids d'une variable : variation du rendement (t/ha) quand la variable
+    augmente d'une unité. Ex. engrais +1,5 t/ha.
+
+R² (coefficient de détermination)
+    Part de la variance de la cible expliquée par le modèle (0 à 1).
+    R² = 0,91 : la formule explique 91 % des variations du rendement DS1.
+
+Variance
+    Dispersion des valeurs (carré de l'écart-type).
+
+Bruit
+    Partie aléatoire, non expliquée, des données.
+
+Valeur extrême (outlier)
+    Observation très éloignée des autres (ex. maïs du Qatar, 18-21 t/ha).
+
+Winsorisation (plafonnement)
+    Ramener les valeurs au-delà d'un seuil (ici le P99 de chaque culture) à
+    ce seuil, au lieu de les supprimer. Constante YIELD_CAP_QUANTILE = 0.99.
+
+Artefact de granularité
+    Défaut de construction de yield_df.csv : temp.csv contient une ligne par
+    station météo, donc chaque rendement est répété autant de fois que le pays
+    a de stations (Inde : 22 fois). Les grands pays sont surreprésentés.
+    Correction : une ligne par (pays, culture, année), température moyennée.
+
+Granularité
+    Niveau de détail d'une ligne (parcelle, pays-année, station...).
+
+Indicateur national
+    Valeur identique pour toutes les cultures d'un pays une année donnée
+    (pluie, pesticides dans DS2).
+
+
+-------------------------------------------------------------------------------
+D. COHÉRENCE ENTRE LES SOURCES (§4)
+-------------------------------------------------------------------------------
+
+Harmonisation des libellés
+    Faire correspondre les noms de cultures : « Rice, paddy » -> Rice,
+    « Soybeans » -> Soybean. Dictionnaire CROP_MAPPING.
+
+Cultures communes (COMMON_CROPS)
+    Maize, Rice, Soybean, Wheat. Barley (orge) et Cotton (coton) de DS1 n'ont
+    pas d'équivalent FAO et sont exclus.
+
+Périmètre
+    Ensemble des données retenues pour la suite (ici les 4 cultures communes).
+
+Clé de jointure
+    Colonne(s) permettant de relier une ligne d'une table à une ligne d'une
+    autre (ex. pays + année). Il n'en existe aucune entre DS1 et DS2.
+
+Jointure (merge)
+    Combinaison de deux tables sur une clé commune.
+
+Incohérence d'échelle
+    DS1 mesure le climat de la parcelle en saison, DS2 des moyennes annuelles
+    nationales : 35 °C dans l'un ne veut pas dire 35 °C dans l'autre.
+
+Correspondance de quantiles (quantile mapping, to_fao_scale)
+    On compare des POSITIONS, pas des valeurs : une parcelle parmi les 10 %
+    les plus chaudes de DS1 est rapprochée des pays parmi les 10 % les plus
+    chauds de la FAO.
+
+Rang
+    Position d'une valeur une fois toutes les valeurs triées.
+
+Proxy (variable proxy)
+    Variable observable qui remplace une variable absente. Ici :
+    - pesticides = proxy de l'intensification (engrais) ;
+    - fort rendement malgré très peu de pluie = proxy de l'irrigation
+      (ex. riz égyptien, 51 mm/an, ~9 t/ha).
+
+Pays aride
+    Pays recevant moins de 250 mm de pluie par an (seuil utilisé en §4.4).
+
+
+-------------------------------------------------------------------------------
+E. FUSION (§5)
+-------------------------------------------------------------------------------
+
+Fusion / dataset consolidé
+    Combinaison des deux sources en une table unique, « source de vérité »
+    du pipeline d'entraînement.
+
+Enrichissement
+    Ajout à DS1 d'informations venant de DS2 (pesticides, rendement réel).
+
+Appariement statistique (statistical matching)
+    Relier deux jeux sans clé commune en associant des lignes « qui se
+    ressemblent » sur des variables partagées (culture, climat).
+
+Hot-deck (distance hot-deck)
+    Méthode d'appariement où chaque ligne « receveuse » (parcelle DS1)
+    emprunte les valeurs d'une ligne « donneuse » réelle (observation FAO)
+    proche d'elle.
+
+Donneur / receveur
+    Donneur = observation FAO (pays x année) qui prête ses valeurs.
+    Receveur = parcelle DS1 qui les reçoit.
+
+Plus proches voisins (k-NN, NearestNeighbors)
+    Les k observations les plus proches d'un point selon une distance.
+    Ici k = 10 (constante N_DONORS), cherchés parmi la même culture.
+
+Distance euclidienne standardisée
+    Distance « à vol d'oiseau » calculée après standardisation (chaque
+    variable ramenée à moyenne 0 et écart-type 1) pour que température et
+    pluie pèsent autant. donor_distance est exprimée en écarts-types.
+
+Tirage aléatoire du donneur
+    On tire un donneur au hasard parmi les 10 voisins plutôt que de faire une
+    moyenne : cela conserve la variabilité réelle des rendements.
+
+Graine (seed, SEED = 42)
+    Nombre qui fixe le générateur aléatoire : le même tirage est obtenu à
+    chaque exécution (résultat reproductible). random_state=0 joue le même
+    rôle pour les échantillons des graphiques.
+
+Coefficient de conduite (management_factor)
+    Rendement DS1 observé / rendement DS1 attendu au même climat.
+    Vaut 1 en moyenne. ~0,68 sans engrais ni irrigation, ~1,32 avec les deux.
+    Il isole l'effet des pratiques en retirant celui du climat.
+
+Rendement attendu au même climat
+    Prédiction d'une régression linéaire du rendement DS1 sur la pluie et la
+    température uniquement.
+
+Formule de la cible
+    Rendement final = rendement FAO du donneur (potentiel réel culture x
+    climat) x coefficient de conduite DS1 (pratiques + aléa).
+
+Hypothèse multiplicative
+    Supposer que l'effet des pratiques s'applique en POURCENTAGE du rendement
+    potentiel (et non en t/ha ajoutées). C'est la principale hypothèse à
+    documenter.
+
+« Compter la pluie deux fois »
+    Risque évité : la pluie est déjà prise en compte via le donneur FAO, on ne
+    la réintroduit pas via le rendement DS1.
+
+
+-------------------------------------------------------------------------------
+F. VALIDATION ET EXPORT (§6 à §8)
+-------------------------------------------------------------------------------
+
+Effet relatif
+    Rendement d'un groupe divisé par celui d'un groupe de référence (ici
+    « sans engrais ni irrigation »). Permet de comparer DS1 et consolidé.
+
+pivot_table
+    Tableau croisé : rendement moyen par culture (lignes) et par tranche de
+    température (colonnes).
+
+pd.cut / tranches
+    Découpage d'une variable continue en intervalles (15-20 °C, 20-25 °C...).
+
+Dictionnaire des données
+    Tableau décrivant chaque colonne du fichier final : type, source, sens.
+
+Encodage one-hot (pd.get_dummies)
+    Transforme une variable catégorielle en plusieurs colonnes 0/1 (une par
+    modalité). drop_first=True retire une colonne pour éviter la redondance.
+
+Standardisation
+    Centrer-réduire une variable (moyenne 0, écart-type 1).
+
+Fuite de données (data leakage)
+    Quand des informations du jeu de test influencent l'entraînement (ex.
+    standardiser avant de séparer train/test). C'est pourquoi ces
+    prétraitements sont laissés au pipeline d'entraînement.
+
+Pipeline d'entraînement
+    Enchaînement automatisé : prétraitement -> modèle -> évaluation (étapes
+    suivantes du projet).
+
+ACP (Analyse en Composantes Principales)
+    Méthode de réduction de dimension prévue à l'étape suivante, qui
+    confirmera l'exclusion des variables sans effet.
+
+Moteur / fonction de recommandation
+    Outil qui proposera la culture au meilleur rendement pour des conditions
+    données. Il a besoin que le rendement varie selon la culture ET le climat,
+    ce que DS1 seul ne permettait pas.
+
+
+-------------------------------------------------------------------------------
+G. TYPES DE GRAPHIQUES
+-------------------------------------------------------------------------------
+
+Histogramme (histplot)       Répartition d'une variable numérique en barres.
+Diagramme en barres (bar)    Effectif ou moyenne par modalité.
+Boîte à moustaches (boxplot) Médiane, quartiles et étendue par groupe.
+                             showfliers=False masque les points extrêmes.
+Nuage de points (scatterplot) Une variable contre une autre, un point par
+                             ligne (sur un échantillon de SAMPLE = 20 000).
+Courbe de densité (kdeplot)  Version lissée d'un histogramme, utile pour
+                             superposer deux distributions.
+Courbe (lineplot)            Évolution d'une moyenne, ici par année.
+Carte de chaleur (heatmap)   Tableau coloré : rouge/bleu pour les
+                             corrélations, vert (YlGn) pour les rendements.
+hue                          Paramètre seaborn qui colore selon une variable.
+
+
+-------------------------------------------------------------------------------
+H. FONCTIONS ET CONSTANTES DE src/preparation_donnees.py (alias « prep »)
+-------------------------------------------------------------------------------
+
+load_ds1 / load_ds2      Lisent les fichiers CSV bruts.
+clean_ds1                4 cultures communes, rendements > 0, booléens -> 0/1.
+clean_ds2                Doublons retirés, une ligne par (pays, culture, année),
+                         hg/ha -> t/ha, noms harmonisés, plafonnement P99.
+to_fao_scale             Correspondance de quantiles DS1 -> échelle FAO.
+management_factor        Calcule le coefficient de conduite.
+match_donors             Trouve et tire un donneur FAO pour chaque parcelle.
+fuse                     Enchaîne tout et renvoie (dataset, audit).
+
+DS1_PATH, DS2_PATH       Chemins des fichiers sources.
+OUTPUT_PATH              data/processed/dataset_consolide.csv
+CROP_MAPPING             Noms FAO -> noms DS1.
+COMMON_CROPS             Liste triée des 4 cultures communes.
+HG_PER_TONNE = 10 000    Conversion hg/ha -> t/ha.
+YIELD_CAP_QUANTILE=0.99  Seuil de plafonnement.
+N_DONORS = 10            Nombre de voisins candidats.
+SEED = 42                Graine du tirage.
+OUTPUT_COLUMNS           Ordre des 11 colonnes du fichier final.

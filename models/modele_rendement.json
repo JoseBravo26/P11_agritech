@@ -1,0 +1,32 @@
+{
+  "features": [
+    "Crop",
+    "Rainfall_mm",
+    "Temperature_Celsius",
+    "Pesticides_tonnes",
+    "Fertilizer_Used",
+    "Irrigation_Used"
+  ],
+  "cultures": [
+    "Maize",
+    "Rice",
+    "Soybean",
+    "Wheat"
+  ],
+  "mlflow_run_id": "43ce2d6322234128ad6c1dfdcc52053e",
+  "metriques_test": {
+    "test_rmse": 1.1769,
+    "test_mae": 0.6841,
+    "test_r2": 0.76,
+    "test_rmse_marge_usd_ha": 274.7337,
+    "test_precision_rentabilite": 0.8426,
+    "test_rmse_Maize": 1.7953,
+    "test_r2_Maize": 0.7146,
+    "test_rmse_Rice": 0.9284,
+    "test_r2_Rice": 0.7609,
+    "test_rmse_Soybean": 0.4807,
+    "test_r2_Soybean": 0.7172,
+    "test_rmse_Wheat": 0.9774,
+    "test_r2_Wheat": 0.7525
+  }
+}

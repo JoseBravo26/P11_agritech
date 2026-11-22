@@ -1,0 +1,208 @@
+# Pipeline CI/CD d'Agritech Answers (étape 5)
+#
+#   1. Tests      : tests unitaires et d'API (pytest), à chaque push et pull request
+#   2. Build      : construction des images Docker de l'API et de l'interface,
+#                   puis test d'intégration sur les conteneurs lancés ensemble
+#   3. Déploiement: publication des images sur Docker Hub (push sur main seulement)
+#   +  Alerte     : ouverture d'un ticket GitHub si une étape échoue
+#
+# Chaque étape ne démarre que si la précédente a réussi.
+# Documentation complète : docs/CI_CD.md
+#
+# Aucun secret n'est écrit ici. Ils se règlent dans GitHub :
+#   Settings > Secrets and variables > Actions
+#     - variable DOCKERHUB_USERNAME : identifiant Docker Hub (active le déploiement)
+#     - secret   DOCKERHUB_TOKEN    : jeton d'accès Docker Hub (jamais le mot de passe)
+#     - secret   API_DEPLOY_HOOK_URL (optionnel) : URL de redéploiement de l'hébergeur de l'API
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**.md", "reports/**", "docs/**"]   # une simple modification de texte ne relance pas tout
+  pull_request:
+    branches: [main]
+  workflow_dispatch:                                   # lancement manuel depuis l'onglet Actions
+
+# Un nouveau push annule l'exécution en cours sur la même branche
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Droits minimaux par défaut ; chaque job n'ajoute que ce dont il a besoin
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  # --------------------------------------------------------------------------- 1. Tests
+  tests:
+    name: 1. Tests unitaires et API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-ci.txt
+            api/requirements.txt
+            frontend/requirements.txt
+
+      - name: Installer les dépendances (versions figées)
+        run: pip install -r requirements-ci.txt
+
+      - name: Lancer les tests
+        # Calcul économique, modèle, API (/predict, /recommend, erreurs 422) et interface Streamlit.
+        # Un seul test en échec arrête le pipeline : aucune image n'est construite.
+        run: python -m pytest tests -v --junitxml=rapport-tests.xml
+
+      - name: Conserver le rapport de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-tests
+          path: rapport-tests.xml
+
+  # --------------------------------------------------------------------------- 2. Build
+  build:
+    name: 2. Build Docker et test d'intégration
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Préparer Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construire l'image de l'API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true                      # garde l'image sur la machine pour le test d'intégration
+          tags: agritech-api:latest
+          cache-from: type=gha,scope=api  # réutilise les couches inchangées (dépendances)
+          cache-to: type=gha,mode=max,scope=api
+
+      - name: Construire l'image de l'interface
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          load: true
+          tags: agritech-front:latest
+          cache-from: type=gha,scope=front
+          cache-to: type=gha,mode=max,scope=front
+
+      - name: Lancer l'API et l'interface ensemble
+        # --wait attend que les deux conteneurs soient déclarés en bonne santé
+        run: docker compose up -d --no-build --wait --wait-timeout 120
+
+      - name: Test d'intégration (requêtes réelles sur les conteneurs)
+        run: python3 scripts/smoke_test.py --api http://localhost:8000 --front http://localhost:8501
+
+      - name: Afficher les journaux des conteneurs en cas d'échec
+        if: failure()
+        run: docker compose logs
+
+      - name: Arrêter les conteneurs
+        if: always()
+        run: docker compose down
+
+  # --------------------------------------------------------------------------- 3. Déploiement
+  deploy:
+    name: 3. Déploiement sur Docker Hub
+    needs: build
+    # Seulement sur la branche main (pas sur les pull requests), et seulement si Docker Hub est configuré
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.DOCKERHUB_USERNAME != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      IMAGE_API: ${{ vars.DOCKERHUB_USERNAME }}/agritech-api
+      IMAGE_FRONT: ${{ vars.DOCKERHUB_USERNAME }}/agritech-front
+      DEPLOY_HOOK: ${{ secrets.API_DEPLOY_HOOK_URL }}
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Préparer Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Se connecter à Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Calculer l'étiquette de version (identifiant court du commit)
+        id: version
+        run: echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Publier l'image de l'API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # « latest » = dernière version ; « sha-xxxxxxx » = version précise, pour revenir en arrière
+          tags: |
+            ${{ env.IMAGE_API }}:latest
+            ${{ env.IMAGE_API }}:${{ steps.version.outputs.tag }}
+          cache-from: type=gha,scope=api
+
+      - name: Publier l'image de l'interface
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.IMAGE_FRONT }}:latest
+            ${{ env.IMAGE_FRONT }}:${{ steps.version.outputs.tag }}
+          cache-from: type=gha,scope=front
+
+      - name: Redéployer l'API chez l'hébergeur (optionnel)
+        if: env.DEPLOY_HOOK != ''
+        run: curl --fail --silent --show-error -X POST "$DEPLOY_HOOK"
+
+      - name: Résumé du déploiement
+        run: |
+          {
+            echo "### Images publiées sur Docker Hub"
+            echo "| Image | Étiquettes |"
+            echo "|---|---|"
+            echo "| \`$IMAGE_API\` | latest, ${{ steps.version.outputs.tag }} |"
+            echo "| \`$IMAGE_FRONT\` | latest, ${{ steps.version.outputs.tag }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # --------------------------------------------------------------------------- Alerte
+  alerte:
+    name: Alerte en cas d'échec
+    needs: [tests, build, deploy]
+    if: failure() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Ouvrir (ou compléter) un ticket « Échec du pipeline »
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const lien = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const message = `Le pipeline a échoué sur \`${context.ref.replace('refs/heads/', '')}\` ` +
+                            `(commit ${context.sha.slice(0, 7)}).\n\nDétails : ${lien}`;
+            // Un seul ticket ouvert à la fois : on ajoute un commentaire s'il existe déjà
+            const { data: ouverts } = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'ci-echec' });
+            if (ouverts.length > 0) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: ouverts[0].number, body: message });
+            } else {
+              await github.rest.issues.create({ owner, repo, title: 'Échec du pipeline CI/CD', body: message, labels: ['ci-echec'] });
+            }

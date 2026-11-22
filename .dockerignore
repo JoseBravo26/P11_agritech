@@ -1,0 +1,18 @@
+.venv
+.git
+.claude
+**/__pycache__
+data
+mlruns
+mlflow.db
+notebooks
+reports
+graphify-out
+_archive_ancien_hypotheses
+Agriculture Crop Yield
+Crop Yield Prediction Dataset
+Mission
+*.mp3
+*.stackdump
+tests
+frontend
