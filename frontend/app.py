@@ -26,7 +26,8 @@ def _adresse_api() -> str:
 
 
 API_URL = _adresse_api().rstrip("/")
-TIMEOUT_S = 10
+# L'API hébergée gratuitement (Render) se met en veille : son réveil prend jusqu'à une minute
+TIMEOUT_S = 60
 
 CULTURES = {"Maize": "Maïs", "Rice": "Riz", "Soybean": "Soja", "Wheat": "Blé"}
 
@@ -51,7 +52,8 @@ def appeler_api(methode: str, chemin: str, **kwargs) -> tuple[dict | None, str |
         return None, (f"Impossible de joindre l'API à l'adresse {API_URL}. "
                       "Vérifiez qu'elle est lancée (voir api/README.md).")
     except requests.Timeout:
-        return None, f"L'API n'a pas répondu en {TIMEOUT_S} secondes."
+        return None, (f"L'API n'a pas répondu en {TIMEOUT_S} secondes. Si elle était en veille "
+                      "(hébergement gratuit), elle est peut-être en train de redémarrer : réessayez dans un instant.")
     if r.status_code == 422:
         details = r.json().get("detail", [])
         lignes = [f"{' → '.join(str(x) for x in d.get('loc', [])[1:])} : {d.get('msg')}" for d in details]
@@ -89,7 +91,8 @@ with st.sidebar:
                     label_visibility="collapsed")
 
     st.divider()
-    sante, erreur_sante = etat_api()
+    with st.spinner("Connexion à l'API (jusqu'à une minute si elle était en veille)…"):
+        sante, erreur_sante = etat_api()
     if sante:
         m = sante.get("metriques_test", {})
         st.success("API connectée", icon="✅")
