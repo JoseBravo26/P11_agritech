@@ -23,7 +23,7 @@
 
 **Les résultats en cinq points.**
 
-1. **Six informations suffisent** pour prédire le rendement : la culture, la température, la pluie, le niveau d'intensification agricole du pays, l'usage d'engrais et l'irrigation. L'analyse en composantes principales (ACP) montre que la région, le type de sol, la météo dominante et la durée de culture n'apportent rien.
+1. **Dans les données disponibles, six informations suffisent** pour prédire le rendement : la culture, la température, la pluie, le niveau d'intensification agricole du pays, l'usage d'engrais et l'irrigation. La région, le type de sol, la météo dominante et la durée de culture **n'y ont aucun lien mesurable avec le rendement**, car elles ont été générées au hasard dans le jeu simulé. L'analyse en composantes principales (ACP), les mesures de lien et le modèle concordent : sans ces quatre variables, le modèle est aussi précis. **Cela ne veut pas dire que le sol est sans effet en agriculture réelle** : c'est la première donnée à collecter auprès des clients.
 2. **Le climat et le choix de la culture pèsent plus que les pratiques.** La chaleur fait baisser les rendements, et chaque culture a son climat idéal. L'engrais (+50 % de rendement environ) et l'irrigation (+40 %) comptent, mais moins.
 3. **Le modèle est fiable.** Sur des situations qu'il n'a jamais vues, il se trompe en moyenne de **0,68 tonne par hectare**. Il explique **76 %** des écarts de rendement et classe correctement **84 %** des parcelles en « rentable » ou « non rentable ».
 4. **La recommandation dépend du climat** :
@@ -84,6 +84,16 @@ Les deux sources n'ont **aucune clé commune** (ni pays ni année dans le jeu de
 
 **L'ACP en deux phrases.** Elle résume un grand nombre de variables en quelques « axes ». Les variables portées par le même axe varient ensemble : si le rendement et la pluie sont sur le même axe, ils montent et descendent ensemble.
 
+**Ce que l'ACP peut et ne peut pas dire.**
+
+| L'ACP permet de… | L'ACP ne permet pas de… |
+|---|---|
+| Voir quelles variables varient ensemble, et lesquelles varient avec le rendement (placé parmi les variables analysées) | Mesurer à elle seule le pouvoir prédictif d'une variable : c'est une méthode descriptive |
+| Repérer les variables redondantes : elles se regroupent sur un même axe | Prouver qu'une variable est sans effet dans la réalité : elle ne voit que ce que contiennent les données |
+| Voir si les modalités d'une variable qualitative (sol, région…) se distinguent sur l'axe du rendement | Remplacer un test sur un modèle |
+
+C'est pourquoi chaque conclusion de l'ACP a été **vérifiée par deux mesures supervisées** : le lien direct de chaque variable avec le rendement (section 3.3), et la précision du modèle avec ou sans ces variables (section 4).
+
 ### 3.1 Sur le million de parcelles : un seul axe, celui du rendement
 
 ![Cercle des corrélations, Agriculture Crop Yield](acp/02_ds1_cercle.png)
@@ -94,14 +104,16 @@ Les deux sources n'ont **aucune clé commune** (ni pays ni année dans le jeu de
 | Engrais | 0,46 | **Clé** |
 | Irrigation | 0,37 | **Clé** |
 | Température | 0,09 | Faible ici, mais clé dans les données réelles (voir 3.2) |
-| Durée de culture | 0,01 | Aucun effet |
+| Durée de culture | 0,01 | Aucun lien mesurable dans ce jeu |
 
 - **Le premier axe porte à lui seul le rendement** (corrélation de 0,99). Il réunit la pluie, l'engrais et l'irrigation.
-- **Les autres axes ne regroupent rien.** Chacun résume autant d'information qu'une variable isolée : les variables de ce jeu sont indépendantes entre elles.
+- **Les autres axes ne regroupent rien.** Chacun résume autant d'information qu'une variable isolée : les variables de ce jeu sont **indépendantes entre elles, et non redondantes**. Aucune ne double une autre : si la région ou la météo reprenaient l'information de la température ou de la pluie, elles se regrouperaient avec elles sur un même axe.
 
 ![Variables qualitatives, Agriculture Crop Yield](acp/04_ds1_qualitatives.png)
 
-**Région, type de sol, météo dominante, et même culture : aucun effet.** Toutes leurs modalités se placent au centre de l'axe du rendement : chacune de ces variables en explique moins de 0,001 %. L'absence d'effet de la culture confirme que ce jeu seul ne permet pas de choisir une culture, d'où la fusion avec les données réelles.
+**Région, type de sol, météo dominante, et même culture : aucun lien avec le rendement dans ce jeu.** Toutes leurs modalités se placent au centre de l'axe du rendement : chacune de ces variables en explique moins de 0,001 %. Elles ont été générées au hasard, indépendamment du rendement.
+
+**C'est une propriété du jeu simulé, pas de l'agriculture réelle.** Personne ne soutient qu'un sol sableux et un sol argilo-limoneux donnent les mêmes rendements : réserve en eau, pH et nutriments jouent un rôle connu. Ces données ne permettent simplement pas de mesurer cet effet. De même, l'absence d'effet de la culture dans ce jeu montre qu'il ne suffit pas pour choisir une culture : d'où la fusion avec les données réelles de la FAO.
 
 ### 3.2 Validation sur les données réelles (FAO)
 
@@ -128,9 +140,9 @@ Les deux sources n'ont **aucune clé commune** (ni pays ni année dans le jeu de
 | **Intensification (pesticides)** | Clé | Indique le niveau technique de l'agriculture du pays |
 | **Engrais** | Clé | Environ +50 % de rendement |
 | **Irrigation** | Clé | Environ +40 % de rendement |
-| Région, sol, météo dominante, durée de culture | **Retirées** | Inutile de les demander à l'agriculteur |
+| Région, sol, météo dominante, durée de culture | **Non retenues pour l'instant** | Sans lien mesurable dans les données disponibles. À réintroduire dès que des données réelles existent (en priorité le sol) |
 
-**Ces six variables sont exactement celles du modèle final et de l'application.** Le modèle sans les quatre variables retirées est aussi précis que le modèle complet.
+**Ces six variables sont exactement celles du modèle final et de l'application.** Le modèle sans les quatre variables non retenues est aussi précis que le modèle complet : même erreur type en validation croisée, 1,24 t/ha. Ce verdict vaut pour ces données : avec des mesures de sol réelles, l'analyse serait à refaire.
 
 ---
 
@@ -265,6 +277,7 @@ Parcelle à **25 °C, 600 mm de pluie**, intensification moyenne, **avec engrais
 | Limite | Conséquence | Piste |
 |---|---|---|
 | Le jeu de parcelles est simulé, et son rendement cible a été construit par fusion | Une part de hasard limite la précision atteignable | Collecter des rendements réels chez les clients |
+| Le type de sol, la région et la météo n'ont pas d'effet mesurable, car ils ont été générés au hasard dans le jeu simulé | L'outil ne tient pas compte du sol, alors qu'il compte en agriculture réelle (réserve en eau, pH, nutriments) | Collecter en priorité des données de sol réelles (texture, pH, réserve utile), puis réentraîner le modèle : le pipeline est prêt |
 | L'effet de l'engrais et de l'irrigation est le même pour toutes les cultures | Les gains réels peuvent varier selon la culture | Le mesurer sur des essais de terrain |
 | Les pesticides sont un total national | Ils mesurent un niveau d'intensification, pas une dose à appliquer | Utiliser des doses par hectare si elles sont disponibles |
 | Prix et coûts de référence | Les marges sont indicatives | Laisser l'agriculteur saisir ses propres prix et coûts dans l'interface |

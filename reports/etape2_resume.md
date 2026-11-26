@@ -31,7 +31,7 @@
 
 - **Le modèle linéaire échoue** car l'effet du climat dépend de la culture : le maïs aime la fraîcheur, le riz la chaleur.
 - **Forêt aléatoire et gradient boosting sont à égalité statistique.** La forêt est retenue pour sa meilleure précision de rentabilité.
-- **Région, type de sol, météo dominante et durée de culture sont retirés sans aucune perte** : cela confirme l'étape 1.
+- **Région, type de sol, météo dominante et durée de culture sont retirés sans aucune perte** : cela confirme l'étape 1. Dans le jeu simulé, ces variables ont été générées au hasard, sans lien avec le rendement. Ce constat vaut pour ces données : en agriculture réelle, le sol compte, et il faudra le réintroduire avec des mesures de terrain.
 - **Contrainte de déploiement :** la taille des feuilles des arbres est limitée pour que le modèle tienne en mémoire dans l'API (environ 100 Mo au lieu d'environ 5 Go).
 
 ## 4. Optimisation

@@ -2,7 +2,8 @@
 
 Démarche demandée par la mission :
 1. ACP sur « Agriculture Crop Yield » (DS1, 1 million de parcelles) pour repérer
-   les variables qui vont avec le rendement et celles qui n'apportent rien ;
+   les variables qui vont avec le rendement et celles qui n'y sont pas liées
+   dans ces données ;
 2. ACP de validation sur « Crop Yield Prediction » (FAO, données réelles) ;
 3. synthèse : on compare ces résultats à l'importance des variables dans le
    modèle final (étape 2).
@@ -15,6 +16,11 @@ tous deux portés par le même axe, ils varient ensemble.
 Les variables qualitatives (culture, région, sol, météo) ne servent pas à
 construire les axes (variables « supplémentaires ») : on regarde ensuite si
 leurs modalités se placent à des endroits différents sur ces axes.
+
+Limite à garder en tête : l'ACP est descriptive. Elle montre ce qui varie avec le
+rendement dans ces données, pas l'effet réel d'une variable en agriculture. Ses
+conclusions sont donc recoupées avec des mesures supervisées (lien direct avec le
+rendement, importance des variables dans le modèle) : voir tableau_synthese().
 
 Lancement : python -m src.acp   (figures et tableaux dans reports/acp/)
 """
@@ -303,7 +309,7 @@ def fig_qualitatives(res: ResultatACP, titre: str, chemin: Path, sous_titre: str
     ax.set_ylim(y - 0.4, -0.8)
     ax.set_xlabel(f"Position moyenne sur l'axe {axe[1:]} (en écarts-types des individus)")
     ax.grid(axis="y", visible=False)
-    titrer(fig, titre, sous_titre or "Bande verte : dispersion des individus · points au centre = aucun effet")
+    titrer(fig, titre, sous_titre or "Bande verte : dispersion des individus · points au centre = aucun lien avec l'axe")
     fig.savefig(chemin)
     plt.close(fig)
 
@@ -321,7 +327,7 @@ def fig_synthese(synthese: pd.DataFrame, chemin: Path) -> None:
             if np.isnan(v):
                 # Absente du modèle alors que DS1 la contient = retirée car elle n'apportait rien
                 retiree = synthese.columns[j] == "Modèle final" and not np.isnan(valeurs[i, 0])
-                ax.text(j, i, "retirée (aucun gain)" if retiree else "non mesurée", ha="center", va="center",
+                ax.text(j, i, "non retenue (aucun gain)" if retiree else "non mesurée", ha="center", va="center",
                         fontsize=9, color=GRIS, style="italic")
             else:
                 ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=10.5,
@@ -388,8 +394,9 @@ def main() -> None:
     fig_cercle(res1, "ACP DS1 · Cercle des corrélations", SORTIE / "02_ds1_cercle.png",
                "Le rendement suit la pluie, l'engrais et l'irrigation (axe 1)")
     fig_correlations_axes(res1, "ACP DS1 · Ce que porte chaque axe", SORTIE / "03_ds1_correlations_axes.png")
-    fig_qualitatives(res1, "ACP DS1 · Culture, région, sol et météo n'ont aucun effet",
-                     SORTIE / "04_ds1_qualitatives.png")
+    fig_qualitatives(res1, "ACP DS1 · Culture, région, sol, météo : aucun lien dans ce jeu",
+                     SORTIE / "04_ds1_qualitatives.png",
+                     "Générées au hasard dans ce jeu simulé · points au centre = aucun lien avec le rendement")
 
     # 2. ACP de validation : FAO (données réelles)
     fao = preparer_fao()
