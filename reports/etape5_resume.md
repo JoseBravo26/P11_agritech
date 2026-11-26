@@ -12,7 +12,7 @@
 
 | Étape | Ce qu'elle fait | Ce qui l'arrête |
 |---|---|---|
-| **1. Tests** | Lance 48 tests automatisés sur le calcul économique, le modèle, l'API et l'interface | Un seul test en échec |
+| **1. Tests** | Lance 49 tests automatisés sur le calcul économique, le modèle, l'API et l'interface | Un seul test en échec |
 | **2. Build** | Construit les deux images Docker (API et interface), les lance ensemble et leur envoie de vraies requêtes | Image impossible à construire, service qui ne démarre pas, réponse incorrecte |
 | **3. Déploiement** | Publie les images sur Docker Hub, avec une étiquette par version pour pouvoir revenir en arrière | Identifiants refusés |
 
@@ -35,7 +35,7 @@
 | Calcul économique | 22 | Marge = rendement × prix − coûts ; au seuil de rentabilité, la marge vaut exactement zéro, pour chaque culture |
 | Modèle | 5 | Fichier lisible, prédictions positives et plausibles, l'engrais augmente le rendement |
 | API | 14 | Prédiction, classement, refus des valeurs hors plage (par exemple 60 °C) |
-| Interface | 7 | Chiffres affichés, graphique, tableau, message clair si l'API ne répond pas |
+| Interface | 8 | Choix du pays, chiffres affichés, graphique, tableau, message clair si l'API ne répond pas |
 | **Intégration** | 4 contrôles | Sur les vrais conteneurs : service en ligne, classement des 4 cultures, refus d'une entrée invalide, interface accessible |
 
 ## 5. Sécurité et fiabilité

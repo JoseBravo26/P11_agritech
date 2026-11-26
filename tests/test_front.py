@@ -4,6 +4,7 @@ L'API est simulée : on vérifie ce que l'interface envoie et ce qu'elle affiche
 sans lancer de serveur.
 """
 
+import json
 from pathlib import Path
 
 import pytest
@@ -112,12 +113,27 @@ def test_tri_par_marge_transmis_a_l_api(api):
     assert envoi_vers(api, "/recommend")["params"] == {"tri": "marge"}
 
 
+def liste(at, debut_libelle):
+    return next(s for s in at.selectbox if s.label.startswith(debut_libelle))
+
+
 def test_niveau_de_pesticides_personnalise(api):
     at = lancer()
-    at.selectbox[1].set_value("Valeur personnalisée")
+    liste(at, "Niveau d'intensification").set_value("Valeur personnalisée")
     at.number_input[0].set_value(50_000)
     bouton_envoi(at).click().run()
     assert envoi_vers(api, "/predict")["json"]["Pesticides_tonnes"] == 50_000
+
+
+def test_choix_du_pays_fixe_les_pesticides(api):
+    # L'agriculteur choisit son pays : la valeur nationale de pesticides (FAO) est retrouvée seule
+    table = json.loads((Path(APP).with_name("pays_pesticides.json")).read_text(encoding="utf-8"))
+    at = lancer()
+    liste(at, "Pays de l'exploitation").set_value("France").run()
+    assert not any(s.label.startswith("Niveau d'intensification") for s in at.selectbox)  # menu des niveaux masqué
+    assert any("France" in i.value for i in at.info)
+    bouton_envoi(at).click().run()
+    assert envoi_vers(api, "/predict")["json"]["Pesticides_tonnes"] == table["France"]["pesticides_tonnes"]
 
 
 def test_erreur_422_affichee_lisiblement(api):

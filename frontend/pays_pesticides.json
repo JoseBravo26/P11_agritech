@@ -1,0 +1,507 @@
+{
+ "Afrique du Sud": {
+  "nom_fao": "South Africa",
+  "annee": 2013,
+  "pesticides_tonnes": 26857.0
+ },
+ "Albanie": {
+  "nom_fao": "Albania",
+  "annee": 2013,
+  "pesticides_tonnes": 982.32
+ },
+ "Algérie": {
+  "nom_fao": "Algeria",
+  "annee": 2013,
+  "pesticides_tonnes": 17278.65
+ },
+ "Allemagne": {
+  "nom_fao": "Germany",
+  "annee": 2013,
+  "pesticides_tonnes": 43756.1
+ },
+ "Angola": {
+  "nom_fao": "Angola",
+  "annee": 2013,
+  "pesticides_tonnes": 40.0
+ },
+ "Arabie saoudite": {
+  "nom_fao": "Saudi Arabia",
+  "annee": 2013,
+  "pesticides_tonnes": 5412.5
+ },
+ "Argentine": {
+  "nom_fao": "Argentina",
+  "annee": 2013,
+  "pesticides_tonnes": 171945.54
+ },
+ "Arménie": {
+  "nom_fao": "Armenia",
+  "annee": 2013,
+  "pesticides_tonnes": 278.72
+ },
+ "Australie": {
+  "nom_fao": "Australia",
+  "annee": 2013,
+  "pesticides_tonnes": 45177.18
+ },
+ "Autriche": {
+  "nom_fao": "Austria",
+  "annee": 2013,
+  "pesticides_tonnes": 3108.6
+ },
+ "Azerbaïdjan": {
+  "nom_fao": "Azerbaijan",
+  "annee": 2013,
+  "pesticides_tonnes": 489.8
+ },
+ "Bahamas": {
+  "nom_fao": "Bahamas",
+  "annee": 2013,
+  "pesticides_tonnes": 268.2
+ },
+ "Bahreïn": {
+  "nom_fao": "Bahrain",
+  "annee": 2013,
+  "pesticides_tonnes": 9.14
+ },
+ "Bangladesh": {
+  "nom_fao": "Bangladesh",
+  "annee": 2013,
+  "pesticides_tonnes": 15330.16
+ },
+ "Belgique": {
+  "nom_fao": "Belgium",
+  "annee": 2013,
+  "pesticides_tonnes": 5905.6
+ },
+ "Biélorussie": {
+  "nom_fao": "Belarus",
+  "annee": 2013,
+  "pesticides_tonnes": 9163.51
+ },
+ "Botswana": {
+  "nom_fao": "Botswana",
+  "annee": 2013,
+  "pesticides_tonnes": 17.0
+ },
+ "Brésil": {
+  "nom_fao": "Brazil",
+  "annee": 2013,
+  "pesticides_tonnes": 367778.0
+ },
+ "Bulgarie": {
+  "nom_fao": "Bulgaria",
+  "annee": 2013,
+  "pesticides_tonnes": 1197.0
+ },
+ "Burkina Faso": {
+  "nom_fao": "Burkina Faso",
+  "annee": 2013,
+  "pesticides_tonnes": 843.0
+ },
+ "Burundi": {
+  "nom_fao": "Burundi",
+  "annee": 2013,
+  "pesticides_tonnes": 956.06
+ },
+ "Cameroun": {
+  "nom_fao": "Cameroon",
+  "annee": 2013,
+  "pesticides_tonnes": 1372.47
+ },
+ "Canada": {
+  "nom_fao": "Canada",
+  "annee": 2013,
+  "pesticides_tonnes": 81659.8
+ },
+ "Chili": {
+  "nom_fao": "Chile",
+  "annee": 2013,
+  "pesticides_tonnes": 9830.72
+ },
+ "Colombie": {
+  "nom_fao": "Colombia",
+  "annee": 2013,
+  "pesticides_tonnes": 54563.38
+ },
+ "Croatie": {
+  "nom_fao": "Croatia",
+  "annee": 2013,
+  "pesticides_tonnes": 1836.21
+ },
+ "Danemark": {
+  "nom_fao": "Denmark",
+  "annee": 2013,
+  "pesticides_tonnes": 4118.0
+ },
+ "Égypte": {
+  "nom_fao": "Egypt",
+  "annee": 2013,
+  "pesticides_tonnes": 13653.0
+ },
+ "Équateur": {
+  "nom_fao": "Ecuador",
+  "annee": 2013,
+  "pesticides_tonnes": 6471.77
+ },
+ "Érythrée": {
+  "nom_fao": "Eritrea",
+  "annee": 2013,
+  "pesticides_tonnes": 27.63
+ },
+ "Espagne": {
+  "nom_fao": "Spain",
+  "annee": 2013,
+  "pesticides_tonnes": 54197.0
+ },
+ "Estonie": {
+  "nom_fao": "Estonia",
+  "annee": 2013,
+  "pesticides_tonnes": 567.0
+ },
+ "Finlande": {
+  "nom_fao": "Finland",
+  "annee": 2013,
+  "pesticides_tonnes": 1475.39
+ },
+ "France": {
+  "nom_fao": "France",
+  "annee": 2013,
+  "pesticides_tonnes": 66497.29
+ },
+ "Ghana": {
+  "nom_fao": "Ghana",
+  "annee": 2013,
+  "pesticides_tonnes": 378.97
+ },
+ "Grèce": {
+  "nom_fao": "Greece",
+  "annee": 2013,
+  "pesticides_tonnes": 8081.72
+ },
+ "Guatemala": {
+  "nom_fao": "Guatemala",
+  "annee": 2013,
+  "pesticides_tonnes": 20489.4
+ },
+ "Guinée": {
+  "nom_fao": "Guinea",
+  "annee": 2013,
+  "pesticides_tonnes": 877.19
+ },
+ "Guyana": {
+  "nom_fao": "Guyana",
+  "annee": 2013,
+  "pesticides_tonnes": 358.72
+ },
+ "Haïti": {
+  "nom_fao": "Haiti",
+  "annee": 2013,
+  "pesticides_tonnes": 27.85
+ },
+ "Honduras": {
+  "nom_fao": "Honduras",
+  "annee": 2013,
+  "pesticides_tonnes": 7194.91
+ },
+ "Hongrie": {
+  "nom_fao": "Hungary",
+  "annee": 2013,
+  "pesticides_tonnes": 7744.5
+ },
+ "Inde": {
+  "nom_fao": "India",
+  "annee": 2013,
+  "pesticides_tonnes": 45620.0
+ },
+ "Indonésie": {
+  "nom_fao": "Indonesia",
+  "annee": 2013,
+  "pesticides_tonnes": 1597.0
+ },
+ "Irak": {
+  "nom_fao": "Iraq",
+  "annee": 2013,
+  "pesticides_tonnes": 2162.6
+ },
+ "Irlande": {
+  "nom_fao": "Ireland",
+  "annee": 2013,
+  "pesticides_tonnes": 2950.8
+ },
+ "Italie": {
+  "nom_fao": "Italy",
+  "annee": 2013,
+  "pesticides_tonnes": 55633.0
+ },
+ "Jamaïque": {
+  "nom_fao": "Jamaica",
+  "annee": 2013,
+  "pesticides_tonnes": 909.71
+ },
+ "Japon": {
+  "nom_fao": "Japan",
+  "annee": 2013,
+  "pesticides_tonnes": 52794.3
+ },
+ "Kazakhstan": {
+  "nom_fao": "Kazakhstan",
+  "annee": 2013,
+  "pesticides_tonnes": 8738.38
+ },
+ "Kenya": {
+  "nom_fao": "Kenya",
+  "annee": 2013,
+  "pesticides_tonnes": 1578.0
+ },
+ "Lesotho": {
+  "nom_fao": "Lesotho",
+  "annee": 2013,
+  "pesticides_tonnes": 62.32
+ },
+ "Lettonie": {
+  "nom_fao": "Latvia",
+  "annee": 2013,
+  "pesticides_tonnes": 1250.0
+ },
+ "Liban": {
+  "nom_fao": "Lebanon",
+  "annee": 2013,
+  "pesticides_tonnes": 1816.0
+ },
+ "Libye": {
+  "nom_fao": "Libya",
+  "annee": 2013,
+  "pesticides_tonnes": 3548.0
+ },
+ "Lituanie": {
+  "nom_fao": "Lithuania",
+  "annee": 2013,
+  "pesticides_tonnes": 2515.69
+ },
+ "Madagascar": {
+  "nom_fao": "Madagascar",
+  "annee": 2013,
+  "pesticides_tonnes": 507.94
+ },
+ "Malaisie": {
+  "nom_fao": "Malaysia",
+  "annee": 2013,
+  "pesticides_tonnes": 61445.6
+ },
+ "Malawi": {
+  "nom_fao": "Malawi",
+  "annee": 2013,
+  "pesticides_tonnes": 1500.27
+ },
+ "Mali": {
+  "nom_fao": "Mali",
+  "annee": 2013,
+  "pesticides_tonnes": 1.52
+ },
+ "Maroc": {
+  "nom_fao": "Morocco",
+  "annee": 2013,
+  "pesticides_tonnes": 13697.0
+ },
+ "Maurice": {
+  "nom_fao": "Mauritius",
+  "annee": 2013,
+  "pesticides_tonnes": 671.77
+ },
+ "Mauritanie": {
+  "nom_fao": "Mauritania",
+  "annee": 2013,
+  "pesticides_tonnes": 26.41
+ },
+ "Mexique": {
+  "nom_fao": "Mexico",
+  "annee": 2013,
+  "pesticides_tonnes": 59920.18
+ },
+ "Monténégro": {
+  "nom_fao": "Montenegro",
+  "annee": 2013,
+  "pesticides_tonnes": 82.0
+ },
+ "Mozambique": {
+  "nom_fao": "Mozambique",
+  "annee": 2013,
+  "pesticides_tonnes": 766.93
+ },
+ "Namibie": {
+  "nom_fao": "Namibia",
+  "annee": 2013,
+  "pesticides_tonnes": 56.0
+ },
+ "Népal": {
+  "nom_fao": "Nepal",
+  "annee": 2013,
+  "pesticides_tonnes": 454.53
+ },
+ "Nicaragua": {
+  "nom_fao": "Nicaragua",
+  "annee": 2013,
+  "pesticides_tonnes": 4413.82
+ },
+ "Niger": {
+  "nom_fao": "Niger",
+  "annee": 2013,
+  "pesticides_tonnes": 21.37
+ },
+ "Norvège": {
+  "nom_fao": "Norway",
+  "annee": 2013,
+  "pesticides_tonnes": 761.97
+ },
+ "Nouvelle-Zélande": {
+  "nom_fao": "New Zealand",
+  "annee": 2013,
+  "pesticides_tonnes": 5086.0
+ },
+ "Ouganda": {
+  "nom_fao": "Uganda",
+  "annee": 2013,
+  "pesticides_tonnes": 88.0
+ },
+ "Pakistan": {
+  "nom_fao": "Pakistan",
+  "annee": 2013,
+  "pesticides_tonnes": 0.92
+ },
+ "Papouasie-Nouvelle-Guinée": {
+  "nom_fao": "Papua New Guinea",
+  "annee": 2013,
+  "pesticides_tonnes": 105.0
+ },
+ "Pays-Bas": {
+  "nom_fao": "Netherlands",
+  "annee": 2013,
+  "pesticides_tonnes": 10720.17
+ },
+ "Pérou": {
+  "nom_fao": "Peru",
+  "annee": 2013,
+  "pesticides_tonnes": 17942.97
+ },
+ "Pologne": {
+  "nom_fao": "Poland",
+  "annee": 2013,
+  "pesticides_tonnes": 22204.46
+ },
+ "Portugal": {
+  "nom_fao": "Portugal",
+  "annee": 2013,
+  "pesticides_tonnes": 10126.8
+ },
+ "Qatar": {
+  "nom_fao": "Qatar",
+  "annee": 2013,
+  "pesticides_tonnes": 68.0
+ },
+ "République centrafricaine": {
+  "nom_fao": "Central African Republic",
+  "annee": 2013,
+  "pesticides_tonnes": 22.87
+ },
+ "République dominicaine": {
+  "nom_fao": "Dominican Republic",
+  "annee": 2013,
+  "pesticides_tonnes": 6316.61
+ },
+ "Roumanie": {
+  "nom_fao": "Romania",
+  "annee": 2013,
+  "pesticides_tonnes": 6947.9
+ },
+ "Royaume-Uni": {
+  "nom_fao": "United Kingdom",
+  "annee": 2013,
+  "pesticides_tonnes": 17673.46
+ },
+ "Rwanda": {
+  "nom_fao": "Rwanda",
+  "annee": 2013,
+  "pesticides_tonnes": 1841.5
+ },
+ "Salvador": {
+  "nom_fao": "El Salvador",
+  "annee": 2013,
+  "pesticides_tonnes": 6005.08
+ },
+ "Sénégal": {
+  "nom_fao": "Senegal",
+  "annee": 2013,
+  "pesticides_tonnes": 722.53
+ },
+ "Slovénie": {
+  "nom_fao": "Slovenia",
+  "annee": 2013,
+  "pesticides_tonnes": 917.49
+ },
+ "Soudan": {
+  "nom_fao": "Sudan",
+  "annee": 2013,
+  "pesticides_tonnes": 2469.47
+ },
+ "Sri Lanka": {
+  "nom_fao": "Sri Lanka",
+  "annee": 2013,
+  "pesticides_tonnes": 1235.31
+ },
+ "Suède": {
+  "nom_fao": "Sweden",
+  "annee": 2013,
+  "pesticides_tonnes": 1620.0
+ },
+ "Suisse": {
+  "nom_fao": "Switzerland",
+  "annee": 2013,
+  "pesticides_tonnes": 2098.5
+ },
+ "Suriname": {
+  "nom_fao": "Suriname",
+  "annee": 2013,
+  "pesticides_tonnes": 537.49
+ },
+ "Tadjikistan": {
+  "nom_fao": "Tajikistan",
+  "annee": 2013,
+  "pesticides_tonnes": 264.6
+ },
+ "Thaïlande": {
+  "nom_fao": "Thailand",
+  "annee": 2013,
+  "pesticides_tonnes": 8136.0
+ },
+ "Tunisie": {
+  "nom_fao": "Tunisia",
+  "annee": 2013,
+  "pesticides_tonnes": 422.24
+ },
+ "Turquie": {
+  "nom_fao": "Turkey",
+  "annee": 2013,
+  "pesticides_tonnes": 39440.0
+ },
+ "Ukraine": {
+  "nom_fao": "Ukraine",
+  "annee": 2013,
+  "pesticides_tonnes": 86781.8
+ },
+ "Uruguay": {
+  "nom_fao": "Uruguay",
+  "annee": 2013,
+  "pesticides_tonnes": 19028.6
+ },
+ "Zambie": {
+  "nom_fao": "Zambia",
+  "annee": 2013,
+  "pesticides_tonnes": 1670.0
+ },
+ "Zimbabwe": {
+  "nom_fao": "Zimbabwe",
+  "annee": 2013,
+  "pesticides_tonnes": 2550.07
+ }
+}

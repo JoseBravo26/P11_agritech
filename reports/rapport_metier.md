@@ -35,7 +35,7 @@
 
     L'engrais est rentable pour toutes les cultures ; l'irrigation, seulement pour le riz.
 
-5. **L'outil est industrialisé.** Chaque modification du code est testée automatiquement (48 tests), puis reconstruite et remise en ligne sans intervention.
+5. **L'outil est industrialisé.** Chaque modification du code est testée automatiquement (49 tests), puis reconstruite et remise en ligne sans intervention.
 
 **Point d'attention.** Les prix et les coûts sont des **références publiques** (Banque mondiale, ministère américain de l'Agriculture). Ils doivent être remplacés par les chiffres réels de chaque exploitation. Ce changement ne demande pas de réentraîner le modèle.
 
@@ -235,6 +235,8 @@ Parcelle à **25 °C, 600 mm de pluie**, intensification moyenne, **avec engrais
 
 ## 6. L'application
 
+*Exemple ci-dessous : une parcelle en France, à 25 °C et 600 mm de pluie, avec engrais. L'agriculture française étant très intensive, les rendements prédits sont plus élevés que dans l'exemple de la section 5.3, qui suppose une intensification moyenne.*
+
 ![Interface : prédiction](app/01_prediction.png)
 
 ![Interface : recommandation](app/02_recommandation.png)
@@ -242,9 +244,10 @@ Parcelle à **25 °C, 600 mm de pluie**, intensification moyenne, **avec engrais
 | Étape | Ce que fait l'utilisateur |
 |---|---|
 | 1 | Choisit le mode : **Prédiction** (une culture) ou **Recommandation** (les quatre) |
-| 2 | Décrit sa parcelle avec des curseurs (température, pluie), un niveau d'intensification et deux interrupteurs (engrais, irrigation) |
-| 3 | Clique sur le bouton pour lancer le calcul |
-| 4 | Lit le résultat : trois chiffres en prédiction ; un graphique (vert si rentable, rouge sinon) et un tableau classé en recommandation |
+| 2 | Choisit **le pays de son exploitation** (101 pays) : l'outil en déduit le niveau d'intensification agricole. Si son pays n'est pas dans la liste, il choisit un niveau (faible, médian, élevé, très élevé) |
+| 3 | Décrit sa parcelle avec des curseurs (température, pluie) et deux interrupteurs (engrais, irrigation) |
+| 4 | Clique sur le bouton pour lancer le calcul |
+| 5 | Lit le résultat : trois chiffres en prédiction ; un graphique (vert si rentable, rouge sinon) et un tableau classé en recommandation |
 
 **Garde-fous :**
 
@@ -262,7 +265,7 @@ Parcelle à **25 °C, 600 mm de pluie**, intensification moyenne, **avec engrais
 
 | Garantie | Comment |
 |---|---|
-| **Qualité** | 48 tests automatiques : calcul de la marge, modèle, API et interface. S'y ajoute un test de bout en bout sur les vrais conteneurs |
+| **Qualité** | 49 tests automatiques : calcul de la marge, modèle, API et interface. S'y ajoute un test de bout en bout sur les vrais conteneurs |
 | **Aucune version cassée en ligne** | Chaque étape (tests, puis construction, puis mise en ligne) ne démarre que si la précédente a réussi |
 | **Mise à jour automatique** | Chaque modification validée est publiée (images Docker sur Docker Hub), puis l'API (Render) et l'interface (Streamlit Cloud) sont redéployées |
 | **Alerte** | En cas d'échec, un e-mail est envoyé et un ticket est ouvert automatiquement |
@@ -279,7 +282,7 @@ Parcelle à **25 °C, 600 mm de pluie**, intensification moyenne, **avec engrais
 | Le jeu de parcelles est simulé, et son rendement cible a été construit par fusion | Une part de hasard limite la précision atteignable | Collecter des rendements réels chez les clients |
 | Le type de sol, la région et la météo n'ont pas d'effet mesurable, car ils ont été générés au hasard dans le jeu simulé | L'outil ne tient pas compte du sol, alors qu'il compte en agriculture réelle (réserve en eau, pH, nutriments) | Collecter en priorité des données de sol réelles (texture, pH, réserve utile), puis réentraîner le modèle : le pipeline est prêt |
 | L'effet de l'engrais et de l'irrigation est le même pour toutes les cultures | Les gains réels peuvent varier selon la culture | Le mesurer sur des essais de terrain |
-| Les pesticides sont un total national | Ils mesurent un niveau d'intensification, pas une dose à appliquer | Utiliser des doses par hectare si elles sont disponibles |
+| Les pesticides sont un total national | Ils mesurent un niveau d'intensification du pays, pas une dose à appliquer. L'agriculteur n'a pas à connaître ce chiffre : il choisit son pays, et la valeur FAO est retrouvée automatiquement (données de 2013) | Remplacer cet indicateur par une donnée de l'exploitation (doses de traitement par hectare) et actualiser les valeurs par pays |
 | Prix et coûts de référence | Les marges sont indicatives | Laisser l'agriculteur saisir ses propres prix et coûts dans l'interface |
 | Quatre cultures seulement | Orge, coton et autres cultures non couvertes | Ajouter des cultures dès que des données réelles existent |
 | Hébergement gratuit | L'API se met en veille : le premier calcul après une pause peut prendre une minute | Passer à une offre payante pour un usage client |
@@ -322,4 +325,4 @@ Parcelle à **25 °C, 600 mm de pluie**, intensification moyenne, **avec engrais
 | API | `api/main.py`, `Dockerfile` |
 | Interface | `frontend/app.py` |
 | Pipeline CI/CD | `.github/workflows/ci-cd.yml`, `docs/CI_CD.md` |
-| Tests | `tests/` (48 tests) |
+| Tests | `tests/` (49 tests) |

@@ -15,7 +15,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY app.py .
+COPY app.py pays_pesticides.json ./
 
 RUN useradd --create-home appuser
 USER appuser

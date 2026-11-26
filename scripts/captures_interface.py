@@ -26,8 +26,15 @@ def main() -> None:
         page = navigateur.new_page(viewport={"width": 1400, "height": 1250}, device_scale_factor=2,
                                    color_scheme="dark")
         # Sur Streamlit Community Cloud, l'application elle-même est servie sous /~/+/
-        page.goto(ADRESSE.rstrip("/") + "/~/+/", wait_until="networkidle", timeout=ATTENTE_MS)
+        suffixe = "/~/+/" if "streamlit.app" in ADRESSE else "/"
+        page.goto(ADRESSE.rstrip("/") + suffixe, wait_until="networkidle", timeout=ATTENTE_MS)
         page.get_by_text("API connectée").wait_for(timeout=ATTENTE_MS)
+
+        # Le pays de l'exploitation est choisi dans la liste : on prend la France
+        page.locator('[data-testid="stSelectbox"]').first.click()   # la liste des pays est la première
+        page.keyboard.type("France")
+        page.keyboard.press("Enter")
+        page.get_by_text("Intensification agricole").wait_for(timeout=ATTENTE_MS)
 
         # 1. Mode prédiction (réglages par défaut : maïs, 25 °C, 600 mm, engrais)
         page.get_by_role("button", name="Lancer la prédiction").click()

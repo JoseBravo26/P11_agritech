@@ -8,7 +8,9 @@ Lancement (depuis la racine du projet, l'API tournant sur le port 8000) :
 L'adresse de l'API se change avec la variable d'environnement API_URL.
 """
 
+import json
 import os
+from pathlib import Path
 
 import altair as alt
 import pandas as pd
@@ -40,6 +42,29 @@ NIVEAUX_PESTICIDES = {
     "Très élevé (90 % en dessous)": 40700,
     "Valeur personnalisée": None,
 }
+
+# Usage national de pesticides par pays (FAO, 2013), produit par scripts/generer_pays_pesticides.py.
+# L'agriculteur choisit son pays : il n'a pas à connaître ce total national.
+FICHIER_PAYS = Path(__file__).with_name("pays_pesticides.json")
+AUTRE_PAYS = "Autre pays : je choisis un niveau"
+
+
+@st.cache_data(show_spinner=False)
+def charger_pays() -> dict:
+    return json.loads(FICHIER_PAYS.read_text(encoding="utf-8"))
+
+
+def qualifier_intensification(tonnes: float) -> str:
+    """Situe l'usage national de pesticides par rapport aux pays-années du jeu d'entraînement."""
+    if tonnes <= 470:
+        return "faible (parmi les 25 % les plus bas)"
+    if tonnes <= 3270:
+        return "modéré (sous la médiane)"
+    if tonnes <= 14200:
+        return "élevé (au-dessus de la médiane)"
+    if tonnes <= 40700:
+        return "très élevé (parmi les 25 % les plus hauts)"
+    return "parmi les plus élevés (10 % les plus hauts)"
 
 
 # --------------------------------------------------------------------------- appels API
@@ -106,6 +131,14 @@ with st.sidebar:
 
 st.subheader("Contexte de la parcelle")
 
+# Le pays est choisi hors du formulaire pour que l'affichage s'adapte tout de suite
+PAYS = charger_pays()
+pays = st.selectbox(
+    "Pays de l'exploitation", [AUTRE_PAYS, *PAYS],
+    help="Sert à estimer le niveau d'intensification de l'agriculture du pays (usage national de "
+         "pesticides, FAO 2013), une des variables du modèle. Si votre pays n'est pas dans la liste, "
+         "choisissez un niveau dans le formulaire.")
+
 with st.form("contexte"):
     col1, col2 = st.columns(2)
     with col1:
@@ -114,13 +147,19 @@ with st.form("contexte"):
         temperature = st.slider("Température moyenne (°C)", 15.0, 40.0, 25.0, 0.5)
         pluie = st.slider("Pluie sur la saison (mm)", 100, 1000, 600, 10)
     with col2:
-        niveau = st.selectbox(
-            "Niveau d'intensification agricole du pays (pesticides)", list(NIVEAUX_PESTICIDES), index=1,
-            help="Le modèle utilise l'usage national de pesticides (tonnes par an), un indicateur du "
-                 "niveau d'intensification de l'agriculture du pays, pas la quantité épandue sur la parcelle.")
-        pesticides_perso = st.number_input("Pesticides, valeur personnalisée (tonnes, pays)",
-                                           0, 400_000, 3270, 100,
-                                           help="Utilisée seulement si « Valeur personnalisée » est choisi.")
+        if pays == AUTRE_PAYS:
+            niveau = st.selectbox(
+                "Niveau d'intensification agricole du pays (pesticides)", list(NIVEAUX_PESTICIDES), index=1,
+                help="Le modèle utilise l'usage national de pesticides (tonnes par an), un indicateur du "
+                     "niveau d'intensification de l'agriculture du pays, pas la quantité épandue sur la parcelle.")
+            pesticides_perso = st.number_input("Pesticides, valeur personnalisée (tonnes, pays)",
+                                               0, 400_000, 3270, 100,
+                                               help="Utilisée seulement si « Valeur personnalisée » est choisi.")
+        else:
+            tonnes_pays = PAYS[pays]["pesticides_tonnes"]
+            st.info(f"**Intensification agricole : {qualifier_intensification(tonnes_pays)}**  \n"
+                    f"{pays} : {tonnes_pays:,.0f} tonnes de pesticides par an "
+                    f"(FAO, {PAYS[pays]['annee']})".replace(",", " "))
         engrais = st.toggle("Engrais appliqué", value=True)
         irrigation = st.toggle("Parcelle irriguée", value=False)
     if mode == "Recommandation":
@@ -128,7 +167,12 @@ with st.form("contexte"):
                        format_func={"rendement": "Rendement (t/ha)", "marge": "Marge estimée (USD/ha)"}.get)
     envoyer = st.form_submit_button("Lancer la " + mode.lower(), type="primary", width="stretch")
 
-pesticides = NIVEAUX_PESTICIDES[niveau] if NIVEAUX_PESTICIDES[niveau] is not None else pesticides_perso
+if pays != AUTRE_PAYS:
+    pesticides = PAYS[pays]["pesticides_tonnes"]
+elif NIVEAUX_PESTICIDES[niveau] is not None:
+    pesticides = NIVEAUX_PESTICIDES[niveau]
+else:
+    pesticides = pesticides_perso
 contexte = {"Rainfall_mm": pluie, "Temperature_Celsius": temperature, "Pesticides_tonnes": pesticides,
             "Fertilizer_Used": engrais, "Irrigation_Used": irrigation}
 
@@ -214,4 +258,4 @@ with st.expander("Comment lire ces chiffres ?"):
         "à remplacer par les prix et coûts réels de l'exploitation.\n"
         "- **Seuil de rentabilité** : rendement minimal pour couvrir ces coûts.\n"
         "- Les curseurs sont limités aux plages du jeu d'entraînement : au-delà, le modèle n'est pas fiable.")
-    st.caption(f"Pesticides envoyés à l'API : {pesticides:,} tonnes (niveau national).".replace(",", " "))
+    st.caption(f"Pesticides envoyés à l'API : {pesticides:,.0f} tonnes (niveau national).".replace(",", " "))

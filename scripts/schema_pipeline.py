@@ -21,7 +21,7 @@ BLOCS = {
     "push":   (0.3, 3.0, 2.2, 1.5, "declencheur", "Déclencheur",
                "push sur main\npull request\nlancement manuel"),
     "tests":  (3.3, 3.0, 2.6, 1.5, "tests", "1. Tests",
-               "48 tests pytest\néconomie · modèle\nAPI · interface"),
+               "49 tests pytest\néconomie · modèle\nAPI · interface"),
     "build":  (6.7, 3.0, 2.8, 1.5, "build", "2. Build",
                "images Docker API + interface\ntest d'intégration\nsur les conteneurs"),
     "deploy": (10.3, 3.0, 2.6, 1.5, "deploy", "3. Déploiement",

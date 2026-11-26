@@ -14,7 +14,7 @@ Le pipeline automatise la chaîne de production de l'application (API FastAPI et
 
 ```mermaid
 flowchart LR
-    D([push / pull request / manuel]) --> T[1. Tests<br/>48 tests pytest]
+    D([push / pull request / manuel]) --> T[1. Tests<br/>49 tests pytest]
     T -- si OK --> B[2. Build<br/>images Docker + test d'intégration]
     B -- si OK, sur main --> P[3. Déploiement<br/>Docker Hub]
     T -. échec .-> A[Alerte<br/>ticket GitHub]
@@ -25,7 +25,7 @@ flowchart LR
 
 | Étape (job) | Rôle | Quand | Ce qui la fait échouer |
 |---|---|---|---|
-| **1. Tests** (`tests`) | Lance les 48 tests automatisés | À chaque push sur `main`, pull request ou lancement manuel | Un seul test en échec |
+| **1. Tests** (`tests`) | Lance les 49 tests automatisés | À chaque push sur `main`, pull request ou lancement manuel | Un seul test en échec |
 | **2. Build** (`build`) | Construit les images Docker de l'API et de l'interface, les lance ensemble et les interroge réellement | Si les tests ont réussi | Image qui ne se construit pas, conteneur qui ne démarre pas, réponse incorrecte |
 | **3. Déploiement** (`deploy`) | Publie les deux images sur Docker Hub, puis redéploie l'API chez l'hébergeur (optionnel) | Si le build a réussi, **sur `main` seulement**, et si Docker Hub est configuré | Identifiants refusés, publication impossible |
 | **Alerte** (`alerte`) | Ouvre un ticket GitHub « Échec du pipeline CI/CD » (ou le complète s'il est déjà ouvert) | Si l'une des étapes précédentes échoue, hors pull request | — |
@@ -55,7 +55,7 @@ Chaque étape attend la réussite de la précédente (`needs:`) : **une image n'
 | `tests/test_economie.py` | 22 | Formule de la marge, coût de l'engrais et de l'irrigation, calcul vectoriel, seuil de rentabilité (marge nulle au seuil, pour chaque culture et chaque combinaison engrais / irrigation) |
 | `tests/test_modele.py` | 5 | Modèle lisible et sous 100 Mo, fiche cohérente, prédictions finies, positives, plausibles et stables, effet positif de l'engrais |
 | `tests/test_api.py` | 14 | `/predict`, `/recommend` (deux tris), `/health`, `/hypotheses`, cohérence entre les deux points d'accès, rejet des entrées invalides (422) |
-| `tests/test_front.py` | 7 | Interface Streamlit avec API simulée : requête envoyée, chiffres affichés, graphique et tableau, messages d'erreur |
+| `tests/test_front.py` | 8 | Interface Streamlit avec API simulée : choix du pays, requête envoyée, chiffres affichés, graphique et tableau, messages d'erreur |
 
 ### 2. Build et test d'intégration
 

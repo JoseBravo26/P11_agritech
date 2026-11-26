@@ -3,7 +3,7 @@
 [![CI/CD](https://github.com/JoseBravo26/P11_agritech/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/JoseBravo26/P11_agritech/actions/workflows/ci-cd.yml)
 [![Docker Hub](https://img.shields.io/docker/v/josibra/agritech-api?label=Docker%20Hub&logo=docker&sort=date)](https://hub.docker.com/r/josibra/agritech-api)
 ![Python](https://img.shields.io/badge/python-3.13-blue?logo=python&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-48-brightgreen)
+![Tests](https://img.shields.io/badge/tests-49-brightgreen)
 
 Application web qui aide un agriculteur à choisir sa culture :
 - **Prédiction** : rendement attendu d'une culture sur sa parcelle ;

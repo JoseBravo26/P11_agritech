@@ -9,7 +9,8 @@
   - **Recommandation** : comparaison des quatre cultures.
 - **Décrire la parcelle** :
   - curseurs pour la température (15 – 40 °C) et la pluie (100 – 1 000 mm), limités aux plages d'entraînement du modèle ;
-  - niveau d'intensification du pays (pesticides) : niveaux prédéfinis tirés des quantiles du jeu de données, ou valeur personnalisée ;
+  - **pays de l'exploitation** (101 pays de la FAO) : l'interface en déduit l'usage national de pesticides, c'est-à-dire le niveau d'intensification agricole. L'agriculteur n'a pas à connaître ce chiffre ;
+  - si le pays n'est pas dans la liste : niveau d'intensification prédéfini (tiré des quantiles du jeu de données) ou valeur personnalisée ;
   - interrupteurs pour l'engrais et l'irrigation.
 - **Lancer la requête** avec un bouton. Les réglages sont regroupés dans un formulaire : l'API n'est appelée qu'au clic.
 - **Lire les résultats** :
@@ -17,9 +18,13 @@
   - en recommandation, un graphique à barres (vert si rentable, rouge sinon) et un tableau classé. Le tri se fait par rendement ou par marge.
 - **État de l'API** dans la barre latérale : connectée ou non, et performance du modèle. Une API injoignable ou une entrée refusée (erreur 422) donne un message lisible, pas une erreur Python.
 
-### Niveaux de pesticides proposés
+### Pays et niveaux de pesticides
 
-Le modèle utilise l'usage **national** de pesticides (tonnes par an), un indicateur du niveau d'intensification de l'agriculture du pays. Ce n'est pas la quantité épandue sur la parcelle : un agriculteur ne connaît pas ce chiffre. L'interface propose donc des niveaux :
+Le modèle utilise l'usage **national** de pesticides (tonnes par an), un indicateur du niveau d'intensification de l'agriculture du pays. Ce n'est pas la quantité épandue sur la parcelle : un agriculteur ne connaît pas ce chiffre.
+
+**L'interface demande donc le pays.** La valeur vient de `pays_pesticides.json` (FAO, année 2013, 101 pays), produit par `scripts/generer_pays_pesticides.py` à partir du jeu *Crop Yield Prediction*. Le niveau correspondant est affiché en clair, par exemple « France : parmi les plus élevés ».
+
+Si le pays n'est pas dans la liste, l'utilisateur choisit un niveau :
 
 | Niveau | Tonnes | Repère dans le jeu de données |
 |---|---|---|
@@ -70,7 +75,7 @@ L'interface cherche l'API sur `http://localhost:8000`. Pour une autre adresse, d
 .venv/Scripts/python -m pytest tests/test_front.py -q
 ```
 
-Les 7 tests simulent l'API, sans lancer de serveur. Ils vérifient :
+Les 8 tests simulent l'API, sans lancer de serveur. Ils vérifient :
 - la page initiale, qui ne lance aucune prédiction ;
 - les données envoyées à `/predict` et les trois chiffres affichés ;
 - le graphique et le tableau de recommandation, avec les noms de cultures en français et le classement ;
