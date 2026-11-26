@@ -58,4 +58,13 @@ GitHub refuse les fichiers de plus de 100 Mo, et le modèle en faisait 104. Il e
 
 **État au 26/11/2026 :** dépôt https://github.com/JoseBravo26/P11_agritech en ligne, pipeline complet au vert (tests, build, déploiement). Images publiées : `josibra/agritech-api` et `josibra/agritech-front` (étiquettes `latest` et `sha-b86e386`).
 
+**Application en ligne :**
+
+| Service | Adresse |
+|---|---|
+| Interface (Streamlit Community Cloud) | https://p11-agritech-answers.streamlit.app |
+| API (Render, offre gratuite) | https://agritech-api-usx2.onrender.com/docs |
+
+L'interface en ligne interroge l'API hébergée et affiche les mêmes résultats qu'en local. Sur l'offre gratuite, l'API se met en veille sans visite : la première requête peut prendre environ une minute.
+
 Ces étapes sont détaillées dans `docs/CI_CD.md`.

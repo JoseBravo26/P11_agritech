@@ -9,6 +9,15 @@ Application web qui aide un agriculteur à choisir sa culture :
 - **Prédiction** : rendement attendu d'une culture sur sa parcelle ;
 - **Recommandation** : les quatre cultures (maïs, riz, soja, blé) simulées et classées par rendement ou par marge.
 
+## Application en ligne
+
+| Service | Adresse | Hébergement |
+|---|---|---|
+| Interface | https://p11-agritech-answers.streamlit.app | Streamlit Community Cloud, redéployée à chaque push sur `main` |
+| API | https://agritech-api-usx2.onrender.com/docs | Render, offre gratuite, image `josibra/agritech-api:latest` |
+
+L'API gratuite se met en veille après une période sans visite : la première requête peut alors prendre environ une minute.
+
 ## Architecture
 
 | Brique | Dossier | Rôle |

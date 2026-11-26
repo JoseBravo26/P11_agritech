@@ -110,9 +110,18 @@ Sur l'offre gratuite, le service se met en veille après une période sans visit
 1. Sur https://share.streamlit.io : *Create app*, choisir le dépôt, la branche `main` et le fichier `frontend/app.py`. Les dépendances sont lues dans `frontend/requirements.txt`.
 2. *Advanced settings* : Python 3.13, puis dans *Secrets* :
    ```toml
-   API_URL = "https://agritech-api.onrender.com"
+   API_URL = "https://agritech-api-usx2.onrender.com"
    ```
 3. Streamlit Cloud **redéploie l'interface automatiquement à chaque push sur `main`**. Il suit le dépôt directement et n'a donc pas besoin d'une étape dans le workflow.
+
+### Déploiement actuel (26/11/2026)
+
+| Service | Adresse | Réglages |
+|---|---|---|
+| API (Render) | https://agritech-api-usx2.onrender.com | Web Service, image `docker.io/josibra/agritech-api:latest`, offre gratuite, région Frankfurt, variable `PORT=8000`, contrôle de santé `/health` |
+| Interface (Streamlit Cloud) | https://p11-agritech-answers.streamlit.app | Dépôt `JoseBravo26/P11_agritech`, branche `main`, fichier `frontend/app.py`, Python 3.13, secret `API_URL` |
+
+Vérifié de bout en bout : l'interface en ligne interroge l'API Render et affiche les mêmes résultats qu'en local (maïs à 25 °C, 600 mm, avec engrais : 2,27 t/ha, 130 USD/ha).
 
 ## 5. Vérifier que les étapes critiques échouent bien
 
