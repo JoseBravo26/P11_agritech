@@ -25,6 +25,7 @@ graphify-out/
 floorplan/.cache/
 *.stackdump
 rapport-tests.xml
+reports/rapport_metier.html
 
 # Secrets éventuels (Streamlit Cloud, variables d'environnement)
 .env

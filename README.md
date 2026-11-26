@@ -38,6 +38,9 @@ Puis ouvrir l'interface sur http://localhost:8501. La documentation de l'API est
 
 ## Documentation
 
+- **Rapport métier** : [reports/rapport_metier.pdf](reports/rapport_metier.pdf) (source : [reports/rapport_metier.md](reports/rapport_metier.md))
+- ACP, variables clés : [notebooks/03_acp.ipynb](notebooks/03_acp.ipynb), figures dans `reports/acp/`
+
 - API : [api/README.md](api/README.md)
 - Interface : [frontend/README.md](frontend/README.md)
 - Pipeline CI/CD (workflows, déclencheurs, secrets, badges) : [docs/CI_CD.md](docs/CI_CD.md)

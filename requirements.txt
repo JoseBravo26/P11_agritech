@@ -8,3 +8,6 @@ nbformat
 nbconvert
 ipykernel
 mlflow>=3.0
+# Rapport métier : conversion Markdown -> PDF et captures de l'interface (navigateur Edge installé)
+markdown>=3.10
+playwright>=1.65
