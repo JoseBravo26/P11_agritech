@@ -54,6 +54,8 @@ GitHub refuse les fichiers de plus de 100 Mo, et le modèle en faisait 104. Il e
 1. Envoyer le code sur le dépôt GitHub (https://github.com/JoseBravo26/P11_agritech).
 2. Dans GitHub, renseigner l'identifiant Docker Hub (variable) et un jeton d'accès (secret) : le déploiement s'active alors tout seul.
 3. Optionnel : héberger l'API (par exemple sur Render, offre gratuite suffisante : l'API utilise environ 330 Mo de mémoire) et brancher l'interface Streamlit Cloud sur son adresse.
-4. Remplacer `UTILISATEUR_DOCKERHUB` dans le badge Docker Hub du `README.md`.
+4. ~~Remplacer l'identifiant Docker Hub dans les badges~~ : fait (`josibra`).
+
+**État au 26/11/2026 :** dépôt https://github.com/JoseBravo26/P11_agritech en ligne, pipeline complet au vert (tests, build, déploiement). Images publiées : `josibra/agritech-api` et `josibra/agritech-front` (étiquettes `latest` et `sha-b86e386`).
 
 Ces étapes sont détaillées dans `docs/CI_CD.md`.

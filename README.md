@@ -1,7 +1,7 @@
 # Agritech Answers — Recommandation de cultures
 
 [![CI/CD](https://github.com/JoseBravo26/P11_agritech/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/JoseBravo26/P11_agritech/actions/workflows/ci-cd.yml)
-[![Docker Hub](https://img.shields.io/docker/v/UTILISATEUR_DOCKERHUB/agritech-api?label=Docker%20Hub&logo=docker&sort=date)](https://hub.docker.com/r/UTILISATEUR_DOCKERHUB/agritech-api)
+[![Docker Hub](https://img.shields.io/docker/v/josibra/agritech-api?label=Docker%20Hub&logo=docker&sort=date)](https://hub.docker.com/r/josibra/agritech-api)
 ![Python](https://img.shields.io/badge/python-3.13-blue?logo=python&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-48-brightgreen)
 
