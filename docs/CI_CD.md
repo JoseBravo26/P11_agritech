@@ -16,7 +16,7 @@ Le pipeline automatise la chaîne de production de l'application (API FastAPI et
 flowchart LR
     D([push / pull request / manuel]) --> T[1. Tests<br/>49 tests pytest]
     T -- si OK --> B[2. Build<br/>images Docker + test d'intégration]
-    B -- si OK, sur main --> P[3. Déploiement<br/>Docker Hub]
+    B -- si OK, sur main --> P[3. Déploiement<br/>Docker Hub + Render]
     T -. échec .-> A[Alerte<br/>ticket GitHub]
     B -. échec .-> A
     P -. échec .-> A
@@ -27,7 +27,7 @@ flowchart LR
 |---|---|---|---|
 | **1. Tests** (`tests`) | Lance les 49 tests automatisés | À chaque push sur `main`, pull request ou lancement manuel | Un seul test en échec |
 | **2. Build** (`build`) | Construit les images Docker de l'API et de l'interface, les lance ensemble et les interroge réellement | Si les tests ont réussi | Image qui ne se construit pas, conteneur qui ne démarre pas, réponse incorrecte |
-| **3. Déploiement** (`deploy`) | Publie les deux images sur Docker Hub, puis redéploie l'API chez l'hébergeur (optionnel) | Si le build a réussi, **sur `main` seulement**, et si Docker Hub est configuré | Identifiants refusés, publication impossible |
+| **3. Déploiement** (`deploy`) | Publie les deux images sur Docker Hub, puis redéploie l'API sur Render (si le secret `API_DEPLOY_HOOK_URL` existe, ce qui est le cas) | Si le build a réussi, **sur `main` seulement**, et si Docker Hub est configuré | Identifiants refusés, publication impossible, redéploiement refusé par Render |
 | **Alerte** (`alerte`) | Ouvre un ticket GitHub « Échec du pipeline CI/CD » (ou le complète s'il est déjà ouvert) | Si l'une des étapes précédentes échoue, hors pull request | — |
 
 Chaque étape attend la réussite de la précédente (`needs:`) : **une image n'est jamais publiée si un test échoue**.
@@ -74,7 +74,7 @@ Chaque étape attend la réussite de la précédente (`needs:`) : **une image n'
 - Publie `agritech-api` et `agritech-front` avec deux étiquettes :
   - `latest` : la dernière version ;
   - `sha-xxxxxxx` : l'identifiant du commit. Il permet de revenir à une version précise en cas de problème, par exemple `docker pull <utilisateur>/agritech-api:sha-1a2b3c4`.
-- Si le secret `API_DEPLOY_HOOK_URL` existe, appelle l'URL de redéploiement de l'hébergeur de l'API (Render, par exemple). Celui-ci récupère alors la nouvelle image.
+- Si le secret `API_DEPLOY_HOOK_URL` existe, appelle l'URL de redéploiement (*Deploy Hook*) de Render. Render récupère alors la nouvelle image `latest` et redémarre l'API en ligne. Ce mécanisme est en place et a été vérifié : chaque push sur `main` qui touche le code met à jour l'API publique en quelques minutes.
 - Écrit un résumé des images publiées sur la page de l'exécution.
 
 ### Alerte en cas d'échec
@@ -92,7 +92,7 @@ Chaque étape attend la réussite de la précédente (`needs:`) : **une image n'
 |---|---|---|---|
 | `DOCKERHUB_USERNAME` | Variable | Identifiant Docker Hub | Oui, pour le déploiement. Sans elle, l'étape 3 est simplement ignorée |
 | `DOCKERHUB_TOKEN` | Secret | Jeton créé dans Docker Hub : *Account settings > Personal access tokens*, droits *Read & Write* | Oui, pour le déploiement |
-| `API_DEPLOY_HOOK_URL` | Secret | URL de redéploiement fournie par l'hébergeur de l'API | Non |
+| `API_DEPLOY_HOOK_URL` | Secret | URL de redéploiement (*Deploy Hook*) du service Render | Non, mais configuré : sans lui, l'API en ligne ne suit plus les nouvelles versions |
 
 Les secrets sont masqués dans les journaux et ne sont jamais transmis aux pull requests venant d'un autre dépôt.
 
@@ -103,7 +103,7 @@ L'interface en ligne doit pouvoir joindre une API publique. Exemple avec **Rende
 2. Copier le *Deploy Hook* du service dans le secret GitHub `API_DEPLOY_HOOK_URL`.
 3. Noter l'adresse publique, par exemple `https://agritech-api.onrender.com`.
 
-Sur l'offre gratuite, le service se met en veille après une période sans visite : la première requête suivante prend une trentaine de secondes.
+Sur l'offre gratuite, le service se met en veille après une quinzaine de minutes sans visite : la première requête suivante prend environ une minute (chargement du modèle compris). C'est pourquoi l'interface attend jusqu'à 60 secondes la réponse de l'API (`TIMEOUT_S` dans `frontend/app.py`) au lieu des 10 secondes initiales.
 
 ### Déployer l'interface sur Streamlit Community Cloud
 
@@ -114,7 +114,7 @@ Sur l'offre gratuite, le service se met en veille après une période sans visit
    ```
 3. Streamlit Cloud **redéploie l'interface automatiquement à chaque push sur `main`**. Il suit le dépôt directement et n'a donc pas besoin d'une étape dans le workflow.
 
-### Déploiement actuel (26/11/2026)
+### Déploiement actuel (27/11/2026)
 
 | Service | Adresse | Réglages |
 |---|---|---|
@@ -122,6 +122,18 @@ Sur l'offre gratuite, le service se met en veille après une période sans visit
 | Interface (Streamlit Cloud) | https://p11-agritech-answers.streamlit.app | Dépôt `JoseBravo26/P11_agritech`, branche `main`, fichier `frontend/app.py`, Python 3.13, secret `API_URL` |
 
 Vérifié de bout en bout : l'interface en ligne interroge l'API Render et affiche les mêmes résultats qu'en local (maïs à 25 °C, 600 mm, avec engrais : 2,27 t/ha, 130 USD/ha).
+
+Dernière exécution vérifiée : commit `1f34e45` (choix du pays de l'exploitation dans l'interface). Pipeline vert (tests, build, déploiement), images republiées sur Docker Hub, API Render redéployée par le hook, et l'interface en ligne affiche « API connectée » et la liste « Pays de l'exploitation ».
+
+**Historique des livraisons par le pipeline :**
+
+| Commit | Contenu |
+|---|---|
+| `b86e386` | Première exécution complète : tests, build, publication Docker Hub |
+| `ab9c34e`, `8a1f1ba` | Badge Docker Hub et adresses de l'application en ligne (documentation) |
+| `04b6a0e` | Interface : délai d'attente porté à 60 s pour le réveil de l'API gratuite |
+| `7bda5b0`, `9c28d61` | ACP (`src/acp.py`) et rapport métier ; l'application déployée n'est pas modifiée |
+| `1f34e45` | Interface : choix du pays, valeur de pesticides FAO retrouvée automatiquement (`frontend/pays_pesticides.json`), un test de plus (49) |
 
 ## 5. Vérifier que les étapes critiques échouent bien
 

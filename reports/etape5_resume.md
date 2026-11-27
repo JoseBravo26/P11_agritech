@@ -14,7 +14,7 @@
 |---|---|---|
 | **1. Tests** | Lance 49 tests automatisés sur le calcul économique, le modèle, l'API et l'interface | Un seul test en échec |
 | **2. Build** | Construit les deux images Docker (API et interface), les lance ensemble et leur envoie de vraies requêtes | Image impossible à construire, service qui ne démarre pas, réponse incorrecte |
-| **3. Déploiement** | Publie les images sur Docker Hub, avec une étiquette par version pour pouvoir revenir en arrière | Identifiants refusés |
+| **3. Déploiement** | Publie les images sur Docker Hub, avec une étiquette par version pour pouvoir revenir en arrière, puis demande à Render de redéployer l'API en ligne | Identifiants refusés, redéploiement refusé par Render |
 
 - **Chaque étape ne démarre que si la précédente a réussi.**
 - **En cas d'échec**, GitHub envoie un e-mail et le pipeline ouvre un ticket « Échec du pipeline CI/CD » avec le lien vers le détail.
@@ -40,7 +40,7 @@
 
 ## 5. Sécurité et fiabilité
 
-- **Aucun mot de passe ni clé dans le code.** Les accès à Docker Hub sont des « secrets » GitHub, masqués dans les journaux. On utilise un jeton révocable, pas le mot de passe.
+- **Aucun mot de passe ni clé dans le code.** Les accès à Docker Hub et l'adresse de redéploiement Render (`API_DEPLOY_HOOK_URL`) sont des « secrets » GitHub, masqués dans les journaux. On utilise un jeton révocable, pas le mot de passe. L'adresse de l'API utilisée par l'interface est un secret de Streamlit Cloud.
 - **Droits minimaux** : le pipeline ne peut que lire le code. Seule l'étape d'alerte peut ouvrir un ticket.
 - **Mêmes versions partout** : les tests utilisent exactement les bibliothèques des images Docker.
 - **Échecs vérifiés** : on a contrôlé en local que le test d'intégration échoue bien quand l'API est arrêtée.
@@ -49,14 +49,24 @@
 
 GitHub refuse les fichiers de plus de 100 Mo, et le modèle en faisait 104. Il est désormais enregistré **compressé : 37 Mo, avec exactement les mêmes prédictions**. Un test le vérifie à chaque exécution. L'image Docker de l'API est aussi passée de 816 à 747 Mo.
 
-## 7. Ce qui reste à faire par l'équipe (une seule fois)
+## 7. Mise en service (faite une seule fois)
 
-1. Envoyer le code sur le dépôt GitHub (https://github.com/JoseBravo26/P11_agritech).
-2. Dans GitHub, renseigner l'identifiant Docker Hub (variable) et un jeton d'accès (secret) : le déploiement s'active alors tout seul.
-3. Optionnel : héberger l'API (par exemple sur Render, offre gratuite suffisante : l'API utilise environ 330 Mo de mémoire) et brancher l'interface Streamlit Cloud sur son adresse.
-4. ~~Remplacer l'identifiant Docker Hub dans les badges~~ : fait (`josibra`).
+| Action | État |
+|---|---|
+| Code envoyé sur GitHub (https://github.com/JoseBravo26/P11_agritech) | Fait |
+| Identifiant Docker Hub (variable) et jeton d'accès (secret) dans GitHub | Fait (`josibra`) |
+| API hébergée sur Render (offre gratuite, environ 330 Mo de mémoire utilisés) | Fait |
+| Redéploiement automatique de Render par le pipeline (secret `API_DEPLOY_HOOK_URL`) | Fait et vérifié |
+| Interface hébergée sur Streamlit Community Cloud, branchée sur l'API Render | Fait |
+| Identifiant Docker Hub dans les badges du README | Fait |
 
-**État au 26/11/2026 :** dépôt https://github.com/JoseBravo26/P11_agritech en ligne, pipeline complet au vert (tests, build, déploiement). Images publiées : `josibra/agritech-api` et `josibra/agritech-front` (étiquettes `latest` et `sha-b86e386`).
+**État au 27/11/2026 :** pipeline complet au vert sur le dernier commit (`1f34e45`, choix du pays dans l'interface) : tests, build, déploiement. Images publiées : `josibra/agritech-api` et `josibra/agritech-front` (étiquette `latest` et une étiquette `sha-…` par version).
+
+**Modifications livrées par le pipeline depuis sa mise en place :**
+
+- l'interface attend jusqu'à 60 s la réponse de l'API, le temps du réveil de Render ;
+- l'ACP et le rapport métier (sans changement de l'application déployée) ;
+- le choix du pays de l'exploitation dans l'interface, avec un test de plus (49 au total).
 
 **Application en ligne :**
 
@@ -65,6 +75,6 @@ GitHub refuse les fichiers de plus de 100 Mo, et le modèle en faisait 104. Il e
 | Interface (Streamlit Community Cloud) | https://p11-agritech-answers.streamlit.app |
 | API (Render, offre gratuite) | https://agritech-api-usx2.onrender.com/docs |
 
-L'interface en ligne interroge l'API hébergée et affiche les mêmes résultats qu'en local. Sur l'offre gratuite, l'API se met en veille sans visite : la première requête peut prendre environ une minute.
+L'interface en ligne interroge l'API hébergée et affiche les mêmes résultats qu'en local. Sur l'offre gratuite, l'API se met en veille sans visite : la première requête peut prendre environ une minute. L'interface est réglée pour patienter jusqu'à 60 secondes.
 
 Ces étapes sont détaillées dans `docs/CI_CD.md`.
